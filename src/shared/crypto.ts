@@ -1,8 +1,18 @@
 const ITERATIONS = 600_000;
+const CHUNK_SIZE = 8192;
+
+function bytesToBase64(bytes: Uint8Array): string {
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += CHUNK_SIZE) {
+    const chunk = bytes.subarray(i, Math.min(i + CHUNK_SIZE, bytes.length));
+    binary += String.fromCharCode(...chunk);
+  }
+  return btoa(binary);
+}
 
 export function generateSalt(): string {
   const salt = crypto.getRandomValues(new Uint8Array(16));
-  return btoa(String.fromCharCode(...salt));
+  return bytesToBase64(salt);
 }
 
 export async function deriveKey(
@@ -48,10 +58,8 @@ export async function encryptData(
     encodedData
   );
 
-  const ciphertext = btoa(
-    String.fromCharCode(...new Uint8Array(encryptedBuffer))
-  );
-  const ivBase64 = btoa(String.fromCharCode(...iv));
+  const ciphertext = bytesToBase64(new Uint8Array(encryptedBuffer));
+  const ivBase64 = bytesToBase64(iv);
 
   return { ciphertext, iv: ivBase64 };
 }

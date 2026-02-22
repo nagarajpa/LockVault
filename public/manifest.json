@@ -11,7 +11,7 @@
   "permissions": ["storage", "identity", "alarms", "activeTab"],
   "host_permissions": ["https://www.googleapis.com/*"],
   "oauth2": {
-    "client_id": "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com",
+    "client_id": "90954327714-232mefab1eh129s5210j8ofk9icdedr0.apps.googleusercontent.com",
     "scopes": ["https://www.googleapis.com/auth/drive.appdata"]
   },
   "background": {

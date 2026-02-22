@@ -1,0 +1,2 @@
+/* Injected into the page but scoped via Shadow DOM -- this file is intentionally minimal.
+   The real styles live inside the Shadow DOM created by autofill.ts */

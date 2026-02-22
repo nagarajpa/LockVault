@@ -3,6 +3,7 @@ import type { VaultEntry } from "@shared/types";
 import { useVault } from "./hooks/useVault";
 import UnlockScreen from "./components/UnlockScreen";
 import VaultList from "./components/VaultList";
+import VaultSwitcher from "./components/VaultSwitcher";
 import AddEditCredential from "./components/AddEditCredential";
 import PasswordGenerator from "./components/PasswordGenerator";
 import Settings from "./components/Settings";
@@ -23,6 +24,11 @@ export default function App() {
     deleteEntry,
     syncVault,
     exportVault,
+    bulkImport,
+    createVaultDatabase,
+    switchVaultDb,
+    renameVaultDb,
+    deleteVaultDb,
   } = useVault();
 
   const [screen, setScreen] = useState<Screen>("vault");
@@ -75,6 +81,24 @@ export default function App() {
 
   return (
     <div className="flex flex-col h-full relative">
+      {/* Header with vault switcher */}
+      {screen === "vault" && (
+        <div className="shrink-0 px-4 pt-3 pb-1 flex items-center justify-between">
+          <VaultSwitcher
+            activeVaultId={appState.activeVaultId}
+            activeVaultName={appState.activeVaultName}
+            vaultList={appState.vaultList}
+            onSwitch={switchVaultDb}
+            onCreate={createVaultDatabase}
+            onRename={renameVaultDb}
+            onDelete={deleteVaultDb}
+          />
+          <span className="text-[10px] text-slate-500">
+            {vault?.entries.length ?? 0} entries
+          </span>
+        </div>
+      )}
+
       {/* Error banner */}
       {error && (
         <div className="px-4 py-2 bg-red-500/10 border-b border-red-500/20 flex items-center justify-between">
@@ -109,6 +133,7 @@ export default function App() {
             onSync={syncVault}
             onExport={handleExport}
             onLock={lock}
+            onImport={bulkImport}
           />
         )}
       </div>

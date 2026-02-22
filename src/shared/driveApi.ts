@@ -1,12 +1,16 @@
 const DRIVE_API = "https://www.googleapis.com/drive/v3/files";
 const UPLOAD_API = "https://www.googleapis.com/upload/drive/v3/files";
-const VAULT_FILENAME = "lockvault.enc";
+
+export function vaultFileName(vaultId: string): string {
+  return `${vaultId}.vault.enc`;
+}
 
 export async function findVaultFileId(
-  accessToken: string
+  accessToken: string,
+  filename: string
 ): Promise<{ id: string; modifiedTime: string } | null> {
   const query = encodeURIComponent(
-    `name = '${VAULT_FILENAME}' and trashed = false`
+    `name = '${filename}' and trashed = false`
   );
   const response = await fetch(
     `${DRIVE_API}?spaces=appDataFolder&q=${query}&fields=files(id,modifiedTime)`,
@@ -38,12 +42,13 @@ export async function downloadVault(
   return response.text();
 }
 
-export async function createVault(
+export async function createVaultFile(
   encryptedData: string,
+  filename: string,
   accessToken: string
 ): Promise<string> {
   const metadata = {
-    name: VAULT_FILENAME,
+    name: filename,
     parents: ["appDataFolder"],
   };
 
@@ -90,19 +95,16 @@ export async function updateVault(
   }
 }
 
-export async function getVaultModifiedTime(
+export async function deleteVaultFile(
   fileId: string,
   accessToken: string
-): Promise<string> {
-  const response = await fetch(
-    `${DRIVE_API}/${fileId}?fields=modifiedTime`,
-    { headers: { Authorization: `Bearer ${accessToken}` } }
-  );
+): Promise<void> {
+  const response = await fetch(`${DRIVE_API}/${fileId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
 
-  if (!response.ok) {
-    throw new Error(`Failed to get vault metadata: ${response.status}`);
+  if (!response.ok && response.status !== 404) {
+    throw new Error(`Failed to delete vault from Drive: ${response.status}`);
   }
-
-  const data = await response.json();
-  return data.modifiedTime;
 }
